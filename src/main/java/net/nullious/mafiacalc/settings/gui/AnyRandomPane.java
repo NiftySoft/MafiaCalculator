@@ -16,28 +16,16 @@
  */
 package net.nullious.mafiacalc.settings.gui;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
 
 import net.nullious.mafiacalc.Tag;
 import net.nullious.mafiacalc.settings.RoleDecider;
 import net.nullious.mafiacalc.settings.StaticDecider;
-
-import javax.swing.BoxLayout;
-import java.awt.GridLayout;
-import java.util.EnumSet;
-import java.util.Set;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
-import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class AnyRandomPane extends JPanel {
 	private JCheckBox chckbxExcludeNeutralRoles;
