@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
  * determine the truths about which we can be certain.
  */
 public class RelationalSimulation extends Simulation {
-    // The role relation, in its current state. This relation maps each role to its set of possible roles.
+    // roleRelation maps each role to its set of possible roles.
     protected final Map<Role, Set<Role>> roleRelation;
 
-    // Maximum number of each role that could possibly still be alive.
+    // maxRolesPossiblyAlive maps each role to the number of instances which could possibly be alive.
     protected final Map<Role, Long> maxRolesPossiblyAlive;
     // isSaveStillAlive.get(i) == true iff it is possible that configured role in configured.get(i) could still be alive.
     protected final List<Boolean> isConfiguredStillAlive;
@@ -47,7 +47,7 @@ public class RelationalSimulation extends Simulation {
         maxRolesPossiblyAlive = new HashMap<>();
         isConfiguredStillAlive = new ArrayList<>(configured.size());
 
-        imageOfConfigured = new ArrayList<>();
+        imageOfConfigured = new ArrayList<>(configured.size());
 
         precompute();
     }
@@ -78,7 +78,7 @@ public class RelationalSimulation extends Simulation {
     private void computeMaxPossiblyAlive() {
         // Create the image of the configured list after the roleRelation is applied.
         for (int i = 0; i < configured.size(); ++i) {
-            imageOfConfigured.set(i, roleRelation.get(configured.get(i)));
+            imageOfConfigured.add(i, roleRelation.get(configured.get(i)));
 
             // Add an empty key to the maxRolesPossiblyAlive map for each role in imageOfConfigured.
             for (Role possibleRole : imageOfConfigured.get(i)) {
@@ -96,7 +96,9 @@ public class RelationalSimulation extends Simulation {
 
     private void computeIsConfiguredStillAlive() {
         // Everyone is alive until they have been proven dead.
-        Collections.fill(isConfiguredStillAlive, true);
+        for (int i = 0; i < configured.size(); ++i) {
+            isConfiguredStillAlive.add(i, true);
+        }
 
         // Try to prove each role is dead in sequence.
         for (int i = 0; i < configured.size(); ++i) {
@@ -110,7 +112,7 @@ public class RelationalSimulation extends Simulation {
             // Find all of the configured roles which the possibleDeadRoles could possibly be.
             List<Role> possiblyDeadConfiguredRoles = configured.stream()
                     .filter(configuredRole -> {
-                        Set<Role> intersectedWithDeadRoles = EnumSet.copyOf(roleRelation.get(configured));
+                        Set<Role> intersectedWithDeadRoles = EnumSet.copyOf(roleRelation.get(configuredRole));
                         intersectedWithDeadRoles.retainAll(possibleDeadRoles);
                         return intersectedWithDeadRoles.isEmpty();
                     })
