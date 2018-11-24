@@ -7,6 +7,10 @@ import net.nullious.mafiacalc.settings.RoleDecider;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * RelationalSimulation just uses the relation between meta and non-meta Roles which is present in the settings to
+ * determine the truths about which we can be certain.
+ */
 public class RelationalSimulation extends Simulation {
     // The role relation, in its current state. This relation maps each role to its set of possible roles.
     protected final Map<Role, Set<Role>> roleRelation;
@@ -16,8 +20,8 @@ public class RelationalSimulation extends Simulation {
     // isSaveStillAlive.get(i) == true iff it is possible that configured role in configured.get(i) could still be alive.
     protected final List<Boolean> isConfiguredStillAlive;
 
-    // Image of the configured list under the RoleDecider relation.
-    protected final List<Set<Role>> imageOfSave;
+    // imageOfConfigured is the image of the configured list under the roleRelation.
+    protected final List<Set<Role>> imageOfConfigured;
 
     public RelationalSimulation(Map<Role, RoleDecider> settings, List<Role> configured, Set<Role> ignored, List<Role> dead,
                                 List<Role> suspected) {
@@ -27,7 +31,7 @@ public class RelationalSimulation extends Simulation {
         maxRolesPossiblyAlive = new HashMap<>();
         isConfiguredStillAlive = new ArrayList<>(configured.size());
 
-        imageOfSave = new ArrayList<>();
+        imageOfConfigured = new ArrayList<>();
 
         precompute();
     }
@@ -56,21 +60,20 @@ public class RelationalSimulation extends Simulation {
     }
 
     private void computeMaxPossiblyAlive() {
-
         // Create the image of the configured list after the roleRelation is applied.
         for (int i = 0; i < configured.size(); ++i) {
-            imageOfSave.set(i, roleRelation.get(configured.get(i)));
+            imageOfConfigured.set(i, roleRelation.get(configured.get(i)));
 
-            // Add an empty key to the maxRolesPossiblyAlive map for each role in imageOfSave.
-            for (Role possibleRole : imageOfSave.get(i)) {
+            // Add an empty key to the maxRolesPossiblyAlive map for each role in imageOfConfigured.
+            for (Role possibleRole : imageOfConfigured.get(i)) {
                 maxRolesPossiblyAlive.put(possibleRole, 0L);
             }
         }
 
         // Compute the maximum number of roles possibly alive for each possible role that could
-        // still be alive. This is just the count of the sets in the imageOfSave map which contain
+        // still be alive. This is just the count of the sets in the imageOfConfigured map which contain
         // the possibleRole.
-        maxRolesPossiblyAlive.replaceAll((role, zero) -> imageOfSave.stream()
+        maxRolesPossiblyAlive.replaceAll((role, zero) -> imageOfConfigured.stream()
                 .filter(roles -> roles.contains(role))
                 .count());
     }
@@ -94,6 +97,8 @@ public class RelationalSimulation extends Simulation {
                     })
                     .collect(Collectors.toList());
 
+            // If there are only as many possiblyDeadConfiguredRoles as there are possibleDeadRoles then
+            // whoever was assigned this configured role is most certainly dead (by the pigeonhole principle).
             if (possibleDeadRoles.size() == possiblyDeadConfiguredRoles.size()) {
                 isConfiguredStillAlive.set(i, false);
             }
