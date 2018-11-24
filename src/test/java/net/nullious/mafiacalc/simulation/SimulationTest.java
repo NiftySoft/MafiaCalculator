@@ -1,4 +1,4 @@
-package net.nullious.mafiacalc.test;
+package net.nullious.mafiacalc.simulation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
