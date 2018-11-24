@@ -59,7 +59,7 @@ public class SimulationFrame extends JFrame {
 	private RoleTabbedListPane roleTabbedListPane;
 	private JTree possibleLivingTree;
 	private JTree suspectAnalysisTree;
-	private JList<Role> possibleRemainingList;
+	private JTree possibleRemainingTree;
 	private JList<Role> suspectedList;
 
 	/**
@@ -217,9 +217,8 @@ public class SimulationFrame extends JFrame {
 		gbc_scrollPane_2.gridy = 1;
 		contentPane.add(scrollPane_2, gbc_scrollPane_2);
 		
-		possibleRemainingList = new JList<Role>();
-		scrollPane_2.setViewportView(possibleRemainingList);
-		possibleRemainingList.setModel(new DefaultListModel<Role>());
+		possibleRemainingTree = new JTree();
+		scrollPane_2.setViewportView(possibleRemainingTree);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
 		GridBagConstraints gbc_scrollPane_3 = new GridBagConstraints();
