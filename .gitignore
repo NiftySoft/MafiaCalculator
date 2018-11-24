@@ -4,3 +4,4 @@
 *.iml
 .*
 !/.gitignore
+dependency-reduced-pom.xml
