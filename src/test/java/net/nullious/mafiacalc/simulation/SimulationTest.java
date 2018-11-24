@@ -4,6 +4,7 @@ import net.nullious.mafiacalc.Role;
 import net.nullious.mafiacalc.settings.RoleDecider;
 import net.nullious.mafiacalc.settings.gui.SaveSettingsPane;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,7 +36,7 @@ class SimulationTest {
 
 	@ParameterizedTest
 	@ArgumentsSource(value = SimulationProvider.class)
-	void test(Class<?> sim_class) throws Exception {
+	void test_basic_non_meta_role_elimination(Class<?> sim_class) throws Exception {
 		// Specify inputs and outputs
 		Map<Role, RoleDecider> input_settings = (new SaveSettingsPane()).getSaveSettings();
 		List<Role> input_configured = Arrays.asList(new Role[] {
@@ -62,19 +63,51 @@ class SimulationTest {
 		
 		sim.simulate();
 		
+		
 		// Validate the outputs
-		if (!isEquivalentSet(expected_living, sim.getPossiblyLivingRoles())) {
-			fail("Possible Living Roles does not match expected output.");
-		}
-		if (!isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig())) {
-			fail("Possible Initial Roles does not match expected output.");
-		}
-		if (!isEquivalentMap(expected_minCount, sim.getMinPossibleCount())) {
-			fail("Possible Min Count does not match expected output.");
-		}
-		if (!isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount())) {
-			fail("Possible Max Count does not match expected output.");
-		}
+		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output.");
+		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output.");
+		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output.");
+		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output.");
+	}
+
+	@ParameterizedTest
+	@ArgumentsSource(value = SimulationProvider.class)
+	void test_basic_meta_role_elimination(Class<?> sim_class) throws Exception {
+		// Specify inputs and outputs
+		Map<Role, RoleDecider> input_settings = (new SaveSettingsPane()).getSaveSettings();
+		List<Role> input_configured = Arrays.asList(new Role[] {
+				Role.GODFATHER,
+				Role.MAFIA_DECEPTION,
+				Role.MAFIA_DECEPTION,
+				Role.CITIZEN,
+		});
+		List<Role> input_dead = Arrays.asList(new Role[] {
+				Role.FRAMER,
+				Role.JANITOR,
+		});
+		List<Role> input_suspected = Arrays.asList(new Role[] {
+		});
+		Set<Role> input_ignored = EnumSet.noneOf(Role.class);
+		Set<Role> expected_living = EnumSet.of(Role.GODFATHER, Role.CITIZEN);
+		List<Role> expected_remaining = Arrays.asList(new Role[] { Role.GODFATHER, Role.CITIZEN });
+		Map<Role, Integer>  expected_minCount = new HashMap<>();
+		expected_minCount.put(Role.GODFATHER, 1);
+		expected_minCount.put(Role.CITIZEN, 1);
+		Map<Role, Integer>  expected_maxCount = new HashMap<>();
+		expected_maxCount.put(Role.GODFATHER, 1);
+		expected_maxCount.put(Role.CITIZEN, 1);
+		
+		// Run the test.
+		Simulation sim = constructSimulation(sim_class, input_settings, input_configured, input_ignored, input_dead, input_suspected);
+		
+		sim.simulate();
+		
+		// Validate the outputs
+		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output.");
+		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output.");
+		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output.");
+		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output.");
 	}
 
 	private Simulation constructSimulation(Class<?> sim_class, Map<Role, RoleDecider> settings,
