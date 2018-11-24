@@ -16,41 +16,34 @@
  */
 package net.nullious.mafiacalc;
 
-import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
 import net.nullious.mafiacalc.settings.RoleDecider;
-import net.nullious.mafiacalc.simulation.LogicalSimulation;
 import net.nullious.mafiacalc.simulation.Simulation;
 import net.nullious.mafiacalc.simulation.StackSimulation;
-
-import javax.swing.AbstractListModel;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.ListSelectionModel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 @SuppressWarnings("serial")
 public class SimulationFrame extends JFrame {
@@ -67,6 +60,7 @@ public class SimulationFrame extends JFrame {
 	private JList<Role> calculatedConfirmedList;
 	private JList<Role> unmatchedRolesList;
 	private JList<Role> unmatchedMetasList;
+	private JList<Role> suspectedList;
 
 	/**
 	 * Create the frame.
@@ -83,10 +77,10 @@ public class SimulationFrame extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[] {115, 0, 0, 0, 0, 0, 0, 0};
-		gbl_contentPane.rowHeights = new int[]{0, 230, 0, 0, 0};
-		gbl_contentPane.columnWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPane.columnWidths = new int[] {115, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_contentPane.rowHeights = new int[]{0, 230, 0, 0, 0, 0};
+		gbl_contentPane.columnWeights = new double[]{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPane.setLayout(gbl_contentPane);
 		
 		JLabel lblSaveConfiguration = new JLabel("Save Configuration");
@@ -103,45 +97,52 @@ public class SimulationFrame extends JFrame {
 		gbc_lblConfirmedRoles.gridy = 0;
 		contentPane.add(lblConfirmedRoles, gbc_lblConfirmedRoles);
 		
+		JLabel lblSuspectedRoles = new JLabel("Suspected Roles");
+		GridBagConstraints gbc_lblSuspectedRoles = new GridBagConstraints();
+		gbc_lblSuspectedRoles.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSuspectedRoles.gridx = 2;
+		gbc_lblSuspectedRoles.gridy = 0;
+		contentPane.add(lblSuspectedRoles, gbc_lblSuspectedRoles);
+		
 		JLabel lblIgnoredRoles = new JLabel("Ignored Roles");
 		GridBagConstraints gbc_lblIgnoredRoles = new GridBagConstraints();
 		gbc_lblIgnoredRoles.insets = new Insets(0, 0, 5, 5);
-		gbc_lblIgnoredRoles.gridx = 2;
+		gbc_lblIgnoredRoles.gridx = 3;
 		gbc_lblIgnoredRoles.gridy = 0;
 		contentPane.add(lblIgnoredRoles, gbc_lblIgnoredRoles);
 		
 		JLabel lblCalculatedConfirmed = new JLabel("Calculated Confirmed");
 		GridBagConstraints gbc_lblCalculatedConfirmed = new GridBagConstraints();
 		gbc_lblCalculatedConfirmed.insets = new Insets(0, 0, 5, 5);
-		gbc_lblCalculatedConfirmed.gridx = 3;
+		gbc_lblCalculatedConfirmed.gridx = 4;
 		gbc_lblCalculatedConfirmed.gridy = 0;
 		contentPane.add(lblCalculatedConfirmed, gbc_lblCalculatedConfirmed);
 		
 		JLabel lblUnmatchedMetas = new JLabel("Unmatched Metas");
 		GridBagConstraints gbc_lblUnmatchedMetas = new GridBagConstraints();
 		gbc_lblUnmatchedMetas.insets = new Insets(0, 0, 5, 5);
-		gbc_lblUnmatchedMetas.gridx = 4;
+		gbc_lblUnmatchedMetas.gridx = 5;
 		gbc_lblUnmatchedMetas.gridy = 0;
 		contentPane.add(lblUnmatchedMetas, gbc_lblUnmatchedMetas);
 		
 		JLabel lblUnmatchedRoles = new JLabel("Unmatched Roles");
 		GridBagConstraints gbc_lblUnmatchedRoles = new GridBagConstraints();
 		gbc_lblUnmatchedRoles.insets = new Insets(0, 0, 5, 5);
-		gbc_lblUnmatchedRoles.gridx = 5;
+		gbc_lblUnmatchedRoles.gridx = 6;
 		gbc_lblUnmatchedRoles.gridy = 0;
 		contentPane.add(lblUnmatchedRoles, gbc_lblUnmatchedRoles);
 		
 		JLabel lblPossibleRoles = new JLabel("Possible Roles");
 		GridBagConstraints gbc_lblPossibleRoles = new GridBagConstraints();
 		gbc_lblPossibleRoles.insets = new Insets(0, 0, 5, 5);
-		gbc_lblPossibleRoles.gridx = 6;
+		gbc_lblPossibleRoles.gridx = 7;
 		gbc_lblPossibleRoles.gridy = 0;
 		contentPane.add(lblPossibleRoles, gbc_lblPossibleRoles);
 		
 		JLabel lblOptions = new JLabel("Options");
 		GridBagConstraints gbc_lblOptions = new GridBagConstraints();
 		gbc_lblOptions.insets = new Insets(0, 0, 5, 0);
-		gbc_lblOptions.gridx = 7;
+		gbc_lblOptions.gridx = 8;
 		gbc_lblOptions.gridy = 0;
 		contentPane.add(lblOptions, gbc_lblOptions);
 		
@@ -180,27 +181,39 @@ public class SimulationFrame extends JFrame {
 		confirmedScrollPane.setViewportView(confirmedList);
 		confirmedList.setModel(new DefaultListModel<Role>());
 		
-		JScrollPane scrollPane = new JScrollPane();
-		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
-		gbc_scrollPane.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane.gridx = 2;
-		gbc_scrollPane.gridy = 1;
-		contentPane.add(scrollPane, gbc_scrollPane);
+		JScrollPane suspectedScrollPane = new JScrollPane();
+		GridBagConstraints gbc_suspectedScrollPane = new GridBagConstraints();
+		gbc_suspectedScrollPane.insets = new Insets(0, 0, 5, 5);
+		gbc_suspectedScrollPane.fill = GridBagConstraints.BOTH;
+		gbc_suspectedScrollPane.gridx = 2;
+		gbc_suspectedScrollPane.gridy = 1;
+		contentPane.add(suspectedScrollPane, gbc_suspectedScrollPane);
+		
+		suspectedList = new JList<Role>();
+		suspectedScrollPane.setViewportView(suspectedList);
+		suspectedList.setModel(new DefaultListModel<Role>());
+		
+		JScrollPane ignoredScrollPane = new JScrollPane();
+		GridBagConstraints gbc_ignoredScrollPane = new GridBagConstraints();
+		gbc_ignoredScrollPane.insets = new Insets(0, 0, 5, 5);
+		gbc_ignoredScrollPane.fill = GridBagConstraints.BOTH;
+		gbc_ignoredScrollPane.gridx = 3;
+		gbc_ignoredScrollPane.gridy = 1;
+		contentPane.add(ignoredScrollPane, gbc_ignoredScrollPane);
 		
 		ignoredList = new JList<>();
-		scrollPane.setViewportView(ignoredList);
+		ignoredScrollPane.setViewportView(ignoredList);
 		ignoredList.setModel(new DefaultListModel<Role>());
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
 		gbc_scrollPane_1.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane_1.gridx = 3;
+		gbc_scrollPane_1.gridx = 4;
 		gbc_scrollPane_1.gridy = 1;
 		contentPane.add(scrollPane_1, gbc_scrollPane_1);
 		
-		calculatedConfirmedList = new JList();
+		calculatedConfirmedList = new JList<Role>();
 		scrollPane_1.setViewportView(calculatedConfirmedList);
 		calculatedConfirmedList.setModel(new DefaultListModel<Role>());
 		
@@ -208,11 +221,11 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_scrollPane_2 = new GridBagConstraints();
 		gbc_scrollPane_2.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane_2.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane_2.gridx = 4;
+		gbc_scrollPane_2.gridx = 5;
 		gbc_scrollPane_2.gridy = 1;
 		contentPane.add(scrollPane_2, gbc_scrollPane_2);
 		
-		unmatchedMetasList = new JList();
+		unmatchedMetasList = new JList<Role>();
 		scrollPane_2.setViewportView(unmatchedMetasList);
 		unmatchedMetasList.setModel(new DefaultListModel<Role>());
 		
@@ -220,11 +233,11 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_scrollPane_3 = new GridBagConstraints();
 		gbc_scrollPane_3.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane_3.fill = GridBagConstraints.BOTH;
-		gbc_scrollPane_3.gridx = 5;
+		gbc_scrollPane_3.gridx = 6;
 		gbc_scrollPane_3.gridy = 1;
 		contentPane.add(scrollPane_3, gbc_scrollPane_3);
 		
-		unmatchedRolesList = new JList();
+		unmatchedRolesList = new JList<Role>();
 		scrollPane_3.setViewportView(unmatchedRolesList);
 		unmatchedRolesList.setModel(new DefaultListModel<Role>());
 		
@@ -232,7 +245,7 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_possibleScrollPane = new GridBagConstraints();
 		gbc_possibleScrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_possibleScrollPane.fill = GridBagConstraints.BOTH;
-		gbc_possibleScrollPane.gridx = 6;
+		gbc_possibleScrollPane.gridx = 7;
 		gbc_possibleScrollPane.gridy = 1;
 		contentPane.add(possibleScrollPane, gbc_possibleScrollPane);
 		
@@ -244,7 +257,7 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_roleTabbedListPane = new GridBagConstraints();
 		gbc_roleTabbedListPane.insets = new Insets(0, 0, 5, 0);
 		gbc_roleTabbedListPane.fill = GridBagConstraints.BOTH;
-		gbc_roleTabbedListPane.gridx = 7;
+		gbc_roleTabbedListPane.gridx = 8;
 		gbc_roleTabbedListPane.gridy = 1;
 		contentPane.add(roleTabbedListPane, gbc_roleTabbedListPane);
 		
@@ -267,14 +280,33 @@ public class SimulationFrame extends JFrame {
 		gbc_btnUnconfirm.gridy = 2;
 		contentPane.add(btnUnconfirm, gbc_btnUnconfirm);
 		
+		JButton btnUnsuspect = new JButton("Unsuspect");
+		btnUnsuspect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DefaultListModel<Role> model = (DefaultListModel<Role>) suspectedList.getModel();
+				if (suspectedList.getSelectedIndex() == -1) {
+					model.removeElementAt(model.size()-1);
+				} else {
+					model.removeElementAt(suspectedList.getSelectedIndex());
+				}
+				recalculateRoles();
+			}
+		});
+		GridBagConstraints gbc_btnUnsuspect = new GridBagConstraints();
+		gbc_btnUnsuspect.fill = GridBagConstraints.BOTH;
+		gbc_btnUnsuspect.insets = new Insets(0, 0, 5, 5);
+		gbc_btnUnsuspect.gridx = 2;
+		gbc_btnUnsuspect.gridy = 2;
+		contentPane.add(btnUnsuspect, gbc_btnUnsuspect);
+		
 		JButton btnUnignore = new JButton("Unignore");
 		btnUnignore.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DefaultListModel<Role> model = (DefaultListModel<Role>) confirmedList.getModel();
-				if (confirmedList.getSelectedIndex() == -1) {
+				DefaultListModel<Role> model = (DefaultListModel<Role>) ignoredList.getModel();
+				if (ignoredList.getSelectedIndex() == -1) {
 					model.removeElementAt(model.size()-1);
 				} else {
-					model.removeElementAt(confirmedList.getSelectedIndex());
+					model.removeElementAt(ignoredList.getSelectedIndex());
 				}
 				recalculateRoles();
 			}
@@ -282,7 +314,7 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_btnUnignore = new GridBagConstraints();
 		gbc_btnUnignore.fill = GridBagConstraints.BOTH;
 		gbc_btnUnignore.insets = new Insets(0, 0, 5, 5);
-		gbc_btnUnignore.gridx = 2;
+		gbc_btnUnignore.gridx = 3;
 		gbc_btnUnignore.gridy = 2;
 		contentPane.add(btnUnignore, gbc_btnUnignore);
 		
@@ -293,7 +325,7 @@ public class SimulationFrame extends JFrame {
 				
 				DefaultListModel<Role> model = (DefaultListModel<Role>) confirmedList.getModel();
 				
-				if (role != null) {
+				if (role != null && !role.hasTag(Tag.META)) {
 					model.addElement(role);
 					recalculateRoles();
 				}
@@ -302,9 +334,29 @@ public class SimulationFrame extends JFrame {
 		GridBagConstraints gbc_btnConfirm = new GridBagConstraints();
 		gbc_btnConfirm.insets = new Insets(0, 0, 5, 0);
 		gbc_btnConfirm.fill = GridBagConstraints.BOTH;
-		gbc_btnConfirm.gridx = 7;
+		gbc_btnConfirm.gridx = 8;
 		gbc_btnConfirm.gridy = 2;
 		contentPane.add(btnConfirm, gbc_btnConfirm);
+		
+		JButton btnSuspect = new JButton("Suspect");
+		btnSuspect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Role role = roleTabbedListPane.getSelectedRole();
+				
+				DefaultListModel<Role> model = (DefaultListModel<Role>) suspectedList.getModel();
+				
+				if (role != null && !role.hasTag(Tag.META)) {
+					model.addElement(role);
+					recalculateRoles();
+				}
+			}
+		});
+		GridBagConstraints gbc_btnSuspect = new GridBagConstraints();
+		gbc_btnSuspect.fill = GridBagConstraints.BOTH;
+		gbc_btnSuspect.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSuspect.gridx = 8;
+		gbc_btnSuspect.gridy = 3;
+		contentPane.add(btnSuspect, gbc_btnSuspect);
 		
 		JButton btnIgnore = new JButton("Ignore");
 		btnIgnore.addActionListener(new ActionListener() {
@@ -313,7 +365,7 @@ public class SimulationFrame extends JFrame {
 				
 				DefaultListModel<Role> model = (DefaultListModel<Role>) ignoredList.getModel();
 				
-				if (role != null) {
+				if (role != null && !role.hasTag(Tag.META) && !model.contains(role)) {
 					model.addElement(role);
 					recalculateRoles();
 				}
@@ -321,8 +373,8 @@ public class SimulationFrame extends JFrame {
 		});
 		GridBagConstraints gbc_btnIgnore = new GridBagConstraints();
 		gbc_btnIgnore.fill = GridBagConstraints.BOTH;
-		gbc_btnIgnore.gridx = 7;
-		gbc_btnIgnore.gridy = 3;
+		gbc_btnIgnore.gridx = 8;
+		gbc_btnIgnore.gridy = 4;
 		contentPane.add(btnIgnore, gbc_btnIgnore);
 		
 		ArrayList<Role> temp = new ArrayList<Role>();
@@ -334,25 +386,29 @@ public class SimulationFrame extends JFrame {
 	}
 	
 	private void recalculateRoles() {
-		List<Role> possible = new ArrayList<>();
-		Set<Role> ignored = EnumSet.noneOf(Role.class);
 		List<Role> confirmed = new ArrayList<>();
+		List<Role> suspected = new ArrayList<>();
+		Set<Role> ignored = EnumSet.noneOf(Role.class);
 		
-		DefaultListModel<Role> ignmodel = (DefaultListModel<Role>) ignoredList.getModel();
 		DefaultListModel<Role> cnfmodel = (DefaultListModel<Role>) confirmedList.getModel();
+		DefaultListModel<Role> susmodel = (DefaultListModel<Role>) suspectedList.getModel();
+		DefaultListModel<Role> ignmodel = (DefaultListModel<Role>) ignoredList.getModel();
+		
+		for (int x = 0; x < cnfmodel.size(); x++) {
+			assert(!cnfmodel.getElementAt(x).hasTag(Tag.META));
+			confirmed.add(cnfmodel.getElementAt(x));
+		}
+		
+		for (int x = 0; x < susmodel.size(); x++) {
+			assert(!susmodel.getElementAt(x).hasTag(Tag.META));
+			suspected.add(susmodel.getElementAt(x));
+		}
 		
 		for (int x = 0; x < ignmodel.size(); x++) {
 			ignored.add(ignmodel.getElementAt(x));
 		}
-		
-		for (int x = 0; x < cnfmodel.size(); x++) {
-			confirmed.add(cnfmodel.getElementAt(x));
-		}
 
-		// TODO(James): Don't pass null as suspected List.
-		Simulation sim = new StackSimulation(this.settings, this.saveRoles, ignored, confirmed, null);
-		
-		sim.simulate();
+		Simulation sim = new StackSimulation(this.settings, this.saveRoles, ignored, confirmed, suspected);
 		
 		fillList(this.calculatedConfirmedList, sim.getResult_confirmed());
 		fillList(this.unmatchedMetasList, sim.getResult_unmatched_metas());
@@ -403,6 +459,10 @@ public class SimulationFrame extends JFrame {
 	}
 
 	private void fillList(JList<Role> jlist, Collection<Role> content) {
+		if (content == null) {
+			return;
+		}
+		
 		DefaultListModel<Role> model = (DefaultListModel<Role>) jlist.getModel();
 		model.clear();
 		for (Role r : content) {

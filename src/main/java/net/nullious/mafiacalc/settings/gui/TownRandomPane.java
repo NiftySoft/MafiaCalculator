@@ -16,22 +16,16 @@
  */
 package net.nullious.mafiacalc.settings.gui;
 
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
-import net.nullious.mafiacalc.Role;
 import net.nullious.mafiacalc.Tag;
 import net.nullious.mafiacalc.settings.RoleDecider;
 import net.nullious.mafiacalc.settings.StaticDecider;
-
-import java.awt.FlowLayout;
-import javax.swing.JCheckBox;
-import javax.swing.BoxLayout;
 
 public class TownRandomPane extends JPanel {
 	private JCheckBox chckbxExcludeGovernment;
