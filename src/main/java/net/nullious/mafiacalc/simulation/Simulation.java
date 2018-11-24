@@ -48,26 +48,31 @@ public abstract class Simulation {
 		this.suspected = Collections.unmodifiableList(new ArrayList<>(suspected));
 	}
 	
-	protected List<Role> result_confirmed;
-	protected List<Role> result_unmatched_metas;
-	protected List<Role> result_unmatched_roles;
-	protected Set<Role> result_possible_roles;
+	protected Set<Role> result_possibly_living_roles; // #1
+	protected Map<Role, Integer> result_max_possible_count; // #2a
+	protected Map<Role, Integer> result_min_possible_count; // #2b
+	protected List<Role> result_possibly_living_initial_config; // #3
+	protected Object result_suspect_analysis; // #4
 	
 	public abstract void simulate();
 	
-	public List<Role> getResult_confirmed() {
-		return result_confirmed;
+	public Set<Role> getPossiblyLivingRoles() {
+		return result_possibly_living_roles;
 	}
 
-	public List<Role> getResult_unmatched_metas() {
-		return result_unmatched_metas;
+	public Map<Role, Integer> getMaxPossibleCount() {
+		return result_max_possible_count;
 	}
 
-	public List<Role> getResult_unmatched_roles() {
-		return result_unmatched_roles;
+	public Map<Role, Integer> getMinPossibleCount() {
+		return result_min_possible_count;
 	}
-	
-	public Set<Role> getResult_possible_roles() {
-		return result_possible_roles;
+
+	public List<Role> getPossiblyLivingInitialConfig() {
+		return result_possibly_living_initial_config;
+	}
+
+	public Object getSuspectAnalysis() {
+		return result_suspect_analysis;
 	}
 }

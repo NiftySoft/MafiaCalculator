@@ -64,11 +64,7 @@ public class StackSimulation extends Simulation {
 		
 		System.out.println("Simulation ran in " + (System.currentTimeMillis() - start) + "ms");
 		
-		
-		this.result_confirmed = new ArrayList<>();
-		this.result_possible_roles = EnumSet.noneOf(Role.class);
-		this.result_unmatched_metas = new ArrayList<>();
-		this.result_unmatched_roles = new ArrayList<>();
+		this.result_possibly_living_roles = EnumSet.noneOf(Role.class);
 	}
 	
 	private void printEstimate() {

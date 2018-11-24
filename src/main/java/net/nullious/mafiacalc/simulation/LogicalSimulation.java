@@ -130,10 +130,10 @@ public class LogicalSimulation extends Simulation {
 			}
 		}
 		
-		this.result_confirmed = Collections.unmodifiableList(calculated_confirmed);
-		this.result_unmatched_metas = Collections.unmodifiableList(unmatched_metas);
-		this.result_unmatched_roles = Collections.unmodifiableList(unmatched_roles);
-		this.result_possible_roles = Collections.unmodifiableSet(all_possible_roles);
+		//this.result_confirmed = Collections.unmodifiableList(calculated_confirmed);
+		//this.result_unmatched_metas = Collections.unmodifiableList(unmatched_metas);
+		//this.result_unmatched_roles = Collections.unmodifiableList(unmatched_roles);
+		this.result_possibly_living_roles = Collections.unmodifiableSet(all_possible_roles);
 	}
 	
 	// Remove all entries from 'rs' which the user has told us to ignore.

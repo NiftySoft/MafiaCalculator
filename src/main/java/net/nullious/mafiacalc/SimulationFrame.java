@@ -22,10 +22,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,10 +40,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 import net.nullious.mafiacalc.settings.RoleDecider;
+import net.nullious.mafiacalc.simulation.DemoSimulation;
+import net.nullious.mafiacalc.simulation.RelationalSimulation;
 import net.nullious.mafiacalc.simulation.Simulation;
-import net.nullious.mafiacalc.simulation.StackSimulation;
 import javax.swing.JTree;
 
 @SuppressWarnings("serial")
@@ -207,6 +211,7 @@ public class SimulationFrame extends JFrame {
 		contentPane.add(scrollPane_1, gbc_scrollPane_1);
 		
 		possibleLivingTree = new JTree();
+		possibleLivingTree.setRootVisible(false);
 		scrollPane_1.setViewportView(possibleLivingTree);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
@@ -218,6 +223,7 @@ public class SimulationFrame extends JFrame {
 		contentPane.add(scrollPane_2, gbc_scrollPane_2);
 		
 		possibleRemainingTree = new JTree();
+		possibleRemainingTree.setRootVisible(false);
 		scrollPane_2.setViewportView(possibleRemainingTree);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
@@ -229,6 +235,7 @@ public class SimulationFrame extends JFrame {
 		contentPane.add(scrollPane_3, gbc_scrollPane_3);
 		
 		suspectAnalysisTree = new JTree();
+		suspectAnalysisTree.setRootVisible(false);
 		scrollPane_3.setViewportView(suspectAnalysisTree);
 		
 		roleTabbedListPane = new RoleTabbedListPane();
@@ -386,48 +393,59 @@ public class SimulationFrame extends JFrame {
 			ignored.add(ignmodel.getElementAt(x));
 		}
 
-		Simulation sim = new StackSimulation(this.settings, this.saveRoles, ignored, confirmed, suspected);
+		//Simulation sim = new RelationalSimulation(this.settings, this.saveRoles, ignored, confirmed, suspected);
+		Simulation sim = new DemoSimulation(this.settings, this.saveRoles, ignored, confirmed, suspected);
 		
-		/*for (Role r : saveRoles) {
+		sim.simulate();
+		
+		populatePossibleLivingTree(sim);
+		populatePossibleRemainingTree(sim);
+		populateSuspectAnalysisTree(sim);
+	}
+
+	private void populatePossibleLivingTree(Simulation sim) {
+		Role[] roles = sim.getPossiblyLivingRoles().toArray(new Role[0]);
+		Map<Role, Integer> minmap = sim.getMinPossibleCount();
+		Map<Role, Integer> maxmap = sim.getMaxPossibleCount();
+		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+		
+		for (Role r : roles) {
+			DefaultMutableTreeNode min = new DefaultMutableTreeNode("Min Count: " + minmap.get(r), false);
+			DefaultMutableTreeNode max = new DefaultMutableTreeNode("Max Count: " + maxmap.get(r), false);
 			
-			if (!r.hasTag(Tag.META)) {
-				// Put explicitly configured roles in "possible"
-				possible.add(r);
-			} else if (settings.containsKey(r)) {
-				// Expand Meta roles to all their possibilities
-				for (Role mr : settings.get(r).getRoleSet()) {
-					// ... UNLESS they are ignored.
-					if (!ignored.contains(mr)) {
-						possible.add(mr);
-					}
-				}
-			} else {
-				System.err.println("WARN: '" + r + "' is META, but does not have any associated Settings!");
-			}
+			DefaultMutableTreeNode rnode = new DefaultMutableTreeNode(r);
+			rnode.add(min);
+			rnode.add(max);
+			
+			root.add(rnode);
 		}
 		
-		// Cull over-limit roles
-		for (Role r : Role.values()) {
-			if (r.getLimit() > -1) {
-				while (Collections.frequency(possible, r) > r.getLimit()) {
-					possible.remove(r);
-				}
-			}
+		TreeModel model = new DefaultTreeModel(root, true);
+		this.possibleLivingTree.setModel(model);
+	}
+
+	private void populatePossibleRemainingTree(Simulation sim) {
+		List<Role> roles = sim.getPossiblyLivingInitialConfig();
+		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+		
+		for (Role r : roles) {
+			root.add(new DefaultMutableTreeNode(r,false));
 		}
 		
-		// Sort everything
-		Collections.sort(possible, new Comparator<Role>() {
-			@Override
-			public int compare(Role a, Role b) {
-				return a.toString().compareTo(b.toString());
-			}
-		});
+		TreeModel model = new DefaultTreeModel(root, true);
+		this.possibleRemainingTree.setModel(model);
+	}
+
+	private void populateSuspectAnalysisTree(Simulation sim) {
+		Object analysis = sim.getSuspectAnalysis();
 		
-		// Update the lists
-		DefaultListModel<Role> model = new DefaultListModel<>();
-		for (Role r : possible) {
-			model.addElement(r);
-		}
-		possibleList.setModel(model);*/
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+		
+		root.add(new DefaultMutableTreeNode(analysis, false));
+		
+		TreeModel model = new DefaultTreeModel(root, true);
+		this.suspectAnalysisTree.setModel(model);
 	}
 }
