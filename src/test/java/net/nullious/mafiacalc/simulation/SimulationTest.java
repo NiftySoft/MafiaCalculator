@@ -12,13 +12,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 class SimulationTest {
 	
-	private static final Class<?>[] constructor_signature = new Class<?>[] { Map.class, List.class, Set.class, List.class, List.class };
+	private static final Class<?>[] constructor_signature = new Class<?>[] { Map.class, List.class, Set.class,
+			List.class, List.class };
 
 	@ParameterizedTest
 	@ValueSource(classes = { RelationalSimulation.class })
 	void test(Class<?> sim_class) throws Exception {
 		Map<Role, RoleDecider> settings = (new SaveSettingsPane()).getSaveSettings();
-		List<Role> save = Arrays.asList(new Role[] {
+		List<Role> configured = Arrays.asList(new Role[] {
 				Role.GODFATHER,
 				Role.CITIZEN,
 		});
@@ -29,7 +30,7 @@ class SimulationTest {
 		});
 		Set<Role> ignored = EnumSet.noneOf(Role.class);
 		
-		Simulation sim = (Simulation) sim_class.getConstructor(constructor_signature).newInstance(new Object[] { settings, save, ignored, dead, suspected });
+		Simulation sim = constructSimulation(sim_class, settings, configured, ignored, dead, suspected);
 		
 		sim.simulate();
 		
@@ -38,4 +39,10 @@ class SimulationTest {
 		fail("Test failed.");
 	}
 
+	private Simulation constructSimulation(Class<?> sim_class, Map<Role, RoleDecider> settings,
+										   List<Role> configured, Set<Role> ignored, List<Role> dead,
+										   List<Role> suspected) throws Exception {
+		return (Simulation) sim_class.getConstructor(constructor_signature)
+				.newInstance(new Object[] { settings, configured, ignored, dead, suspected });
+	}
 }
