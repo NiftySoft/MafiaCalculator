@@ -95,10 +95,13 @@ public class RelationalSimulation extends Simulation {
     }
 
     private void computeIsConfiguredStillAlive() {
+        // Everyone is alive until they have been proven dead.
         Collections.fill(isConfiguredStillAlive, true);
 
+        // Try to prove each role is dead in sequence.
         for (int i = 0; i < configured.size(); ++i) {
             Role r = configured.get(i);
+
             // Find all of the dead roles that this role could possibly be.
             List<Role> possibleDeadRoles = confirmedDead.stream()
                      .filter(deadRole -> !roleRelation.get(r).contains(deadRole))
