@@ -14,18 +14,18 @@ public class RelationalSimulation extends Simulation {
     // Maximum number of each role that could possibly still be alive.
     protected final Map<Role, Long> maxRolesPossiblyAlive;
     // isSaveStillAlive.get(i) == true iff it is possible that configured role in configured.get(i) could still be alive.
-    protected final List<Boolean> isSaveStillAlive;
+    protected final List<Boolean> isConfiguredStillAlive;
 
     // Image of the configured list under the RoleDecider relation.
     protected final List<Set<Role>> imageOfSave;
 
-    public RelationalSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead,
+    public RelationalSimulation(Map<Role, RoleDecider> settings, List<Role> configured, Set<Role> ignored, List<Role> dead,
                                 List<Role> suspected) {
-        super(settings, save, ignored, dead, suspected);
+        super(settings, configured, ignored, dead, suspected);
 
         roleRelation = new HashMap<>();
         maxRolesPossiblyAlive = new HashMap<>();
-        isSaveStillAlive = new ArrayList<>(save.size());
+        isConfiguredStillAlive = new ArrayList<>(configured.size());
 
         imageOfSave = new ArrayList<>();
 
@@ -33,7 +33,6 @@ public class RelationalSimulation extends Simulation {
     }
 
     public void precompute() {
-
         // Create the role relation as it is presently understood.
         for (Role r : Role.values()) {
             if(!ignored.contains(r)) {
@@ -48,6 +47,15 @@ public class RelationalSimulation extends Simulation {
                 }
             }
         }
+    }
+
+    @Override
+    public void simulate() {
+        computeMaxPossiblyAlive();
+        computeIsConfiguredStillAlive();
+    }
+
+    private void computeMaxPossiblyAlive() {
 
         // Create the image of the configured list after the roleRelation is applied.
         for (int i = 0; i < configured.size(); ++i) {
@@ -63,13 +71,32 @@ public class RelationalSimulation extends Simulation {
         // still be alive. This is just the count of the sets in the imageOfSave map which contain
         // the possibleRole.
         maxRolesPossiblyAlive.replaceAll((role, zero) -> imageOfSave.stream()
-                                                                    .filter(roles -> roles.contains(role))
-                                                                    .count());
+                .filter(roles -> roles.contains(role))
+                .count());
     }
 
-    @Override
-    public void simulate() {
+    private void computeIsConfiguredStillAlive() {
+        Collections.fill(isConfiguredStillAlive, true);
 
+        for (int i = 0; i < configured.size(); ++i) {
+            Role r = configured.get(i);
+            // Find all of the dead roles that this role could possibly be.
+            List<Role> possibleDeadRoles = confirmedDead.stream()
+                     .filter(deadRole -> !roleRelation.get(r).contains(deadRole))
+                     .collect(Collectors.toList());
+
+            // Find all of the configured roles which the possibleDeadRoles could possibly be.
+            List<Role> possiblyDeadConfiguredRoles = configured.stream()
+                    .filter(configuredRole -> {
+                        Set<Role> intersectedWithDeadRoles = EnumSet.copyOf(roleRelation.get(configured));
+                        intersectedWithDeadRoles.retainAll(possibleDeadRoles);
+                        return intersectedWithDeadRoles.isEmpty();
+                    })
+                    .collect(Collectors.toList());
+
+            if (possibleDeadRoles.size() == possiblyDeadConfiguredRoles.size()) {
+                isConfiguredStillAlive.set(i, false);
+            }
+        }
     }
-
 }
