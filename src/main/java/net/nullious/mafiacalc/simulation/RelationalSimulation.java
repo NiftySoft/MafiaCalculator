@@ -8,18 +8,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RelationalSimulation extends Simulation {
+    // The role relation, in its current state. This relation maps each role to its set of possible roles.
     protected final Map<Role, Set<Role>> roleRelation;
 
     // Maximum number of each role that could possibly still be alive.
     protected final Map<Role, Long> maxRolesPossiblyAlive;
-    // isSaveStillAlive.get(i) == true iff it is possible that configured role in save.get(i) could still be alive.
+    // isSaveStillAlive.get(i) == true iff it is possible that configured role in configured.get(i) could still be alive.
     protected final List<Boolean> isSaveStillAlive;
 
-    // Image of the save list under the RoleDecider relation.
+    // Image of the configured list under the RoleDecider relation.
     protected final List<Set<Role>> imageOfSave;
 
-    public RelationalSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead) {
-        super(settings, save, ignored, dead);
+    public RelationalSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead,
+                                List<Role> suspected) {
+        super(settings, save, ignored, dead, suspected);
 
         roleRelation = new HashMap<>();
         maxRolesPossiblyAlive = new HashMap<>();
@@ -36,7 +38,7 @@ public class RelationalSimulation extends Simulation {
         for (Role r : Role.values()) {
             if(!ignored.contains(r)) {
                 if (!r.getTags().contains(Tag.META)) {
-                    // Non-meta roles are always themselves.
+                    // Non-meta roles are always mapped to the set containing just themselves.
                     roleRelation.put(r, Collections.singleton(r));
                 } else {
                     // Meta roles could be any non-ignored role configured in the settings.
@@ -47,9 +49,9 @@ public class RelationalSimulation extends Simulation {
             }
         }
 
-        // Create the image of the save list after the roleRelation is applied.
-        for (int i = 0; i < save.size(); ++i) {
-            imageOfSave.set(i, roleRelation.get(save.get(i)));
+        // Create the image of the configured list after the roleRelation is applied.
+        for (int i = 0; i < configured.size(); ++i) {
+            imageOfSave.set(i, roleRelation.get(configured.get(i)));
 
             // Add an empty key to the maxRolesPossiblyAlive map for each role in imageOfSave.
             for (Role possibleRole : imageOfSave.get(i)) {

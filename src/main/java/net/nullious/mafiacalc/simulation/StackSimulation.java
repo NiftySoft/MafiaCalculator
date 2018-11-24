@@ -19,7 +19,6 @@ package net.nullious.mafiacalc.simulation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +26,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.nullious.mafiacalc.Role;
 import net.nullious.mafiacalc.Tag;
@@ -38,8 +36,9 @@ public class StackSimulation extends Simulation {
 	private final Role[] all_roles = Role.getNormalSet().toArray(new Role[0]);
 	private List<List<Role>> possibilities;
 
-	public StackSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead) {
-		super(settings, save, ignored, dead);
+	public StackSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead,
+						   List<Role> suspected) {
+		super(settings, save, ignored, dead, suspected);
 	}
 
 	@Override
@@ -75,7 +74,7 @@ public class StackSimulation extends Simulation {
 	private void printEstimate() {
 		int estimate = 1;
 		
-		for (Role r : this.save) {
+		for (Role r : this.configured) {
 			if (r.hasTag(Tag.META)) {
 				estimate *= this.settings.get(r).getRoleSet().size();
 			}
@@ -102,7 +101,7 @@ public class StackSimulation extends Simulation {
 		@Override
 		public void run() {
 			int slot = this.inherited.size();
-			Role next = save.get(slot);
+			Role next = configured.get(slot);
 			
 			//System.out.println(this.inherited);
 			
@@ -111,7 +110,7 @@ public class StackSimulation extends Simulation {
 				inheritance.add(next);
 				
 				if (isPossible(inheritance)) {
-					if (inheritance.size() < save.size()) {
+					if (inheritance.size() < configured.size()) {
 						StackWorker child = new StackWorker(inheritance, this.output_buffer, this.pending_count, true);
 						child.run();
 					} else {
@@ -125,7 +124,7 @@ public class StackSimulation extends Simulation {
 					inheritance.add(candidate);
 					
 					if (isPossible(inheritance)) {
-						if (inheritance.size() < save.size()) {
+						if (inheritance.size() < configured.size()) {
 							if (this.pending_count.get() < 64) {
 								StackWorker child = new StackWorker(inheritance, this.output_buffer, this.pending_count, false);
 								executor.execute(child);
@@ -144,7 +143,7 @@ public class StackSimulation extends Simulation {
 		}
 		
 		private void recordPossibility(List<Role> stack) {
-			if (stack.size() != save.size()) {
+			if (stack.size() != configured.size()) {
 				throw new IllegalArgumentException("Stack size is invalid");
 			}
 			
@@ -152,14 +151,14 @@ public class StackSimulation extends Simulation {
 		}
 		
 		private boolean isPossible(List<Role> candidate) {
-			if (candidate.size() > save.size()) {
+			if (candidate.size() > configured.size()) {
 				System.err.println("WARN: isPossible() is checking a too-big candidate!");
 				return false;
 			}
 			
 			int x = 0;
 			for (Role c : candidate) {
-				Role from_save = save.get(x);
+				Role from_save = configured.get(x);
 				if (from_save.hasTag(Tag.META)) {
 					if (!settings.get(from_save).getRoleSet().contains(c)) {
 						return false;

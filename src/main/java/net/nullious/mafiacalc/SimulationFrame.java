@@ -348,8 +348,9 @@ public class SimulationFrame extends JFrame {
 		for (int x = 0; x < cnfmodel.size(); x++) {
 			confirmed.add(cnfmodel.getElementAt(x));
 		}
-		
-		Simulation sim = new StackSimulation(this.settings, this.saveRoles, ignored, confirmed);
+
+		// TODO(James): Don't pass null as suspected List.
+		Simulation sim = new StackSimulation(this.settings, this.saveRoles, ignored, confirmed, null);
 		
 		sim.simulate();
 		

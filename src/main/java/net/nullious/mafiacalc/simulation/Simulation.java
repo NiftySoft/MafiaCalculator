@@ -31,17 +31,21 @@ public abstract class Simulation {
 	// META-Role -> Role Decider. Used to lookup what Roles can be picked for "Random Any", etc.
 	protected final Map<Role, RoleDecider> settings;
 	// An exact list of all Roles (META and non-META) which were configured in the game.
-	protected final List<Role> save;
+	protected final List<Role> configured;
 	// User-provided set of every Role that is impossible in the current game.
 	protected final Set<Role> ignored;
 	// User-provided list of every role that has died so far.
-	protected final List<Role> dead;
+	protected final List<Role> confirmedDead;
+	// User-provided list of suspected roles for each entry in configured.
+	protected final List<Role> suspected;
 
-	public Simulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead) {
+	public Simulation(Map<Role, RoleDecider> settings, List<Role> configured, Set<Role> ignored, List<Role> confirmedDead,
+					  List<Role> suspected) {
 		this.settings = Collections.unmodifiableMap(new EnumMap<>(settings));
-		this.save = Collections.unmodifiableList(new ArrayList<>(save));
+		this.configured = Collections.unmodifiableList(new ArrayList<>(configured));
 		this.ignored = Collections.unmodifiableSet(EnumSet.copyOf(ignored));
-		this.dead = Collections.unmodifiableList(new ArrayList<>(dead));
+		this.confirmedDead = Collections.unmodifiableList(new ArrayList<>(confirmedDead));
+		this.suspected = Collections.unmodifiableList(new ArrayList<>(suspected));
 	}
 	
 	protected List<Role> result_confirmed;

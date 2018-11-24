@@ -18,7 +18,6 @@ package net.nullious.mafiacalc.simulation;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,9 @@ import net.nullious.mafiacalc.settings.RoleDecider;
 
 public class LogicalSimulation extends Simulation {
 	
-	public LogicalSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead) {
-		super(settings, save, ignored, dead);
+	public LogicalSimulation(Map<Role, RoleDecider> settings, List<Role> save, Set<Role> ignored, List<Role> dead,
+							 List<Role> suspected) {
+		super(settings, save, ignored, dead, suspected);
 	}
 
 	public void simulate() {
@@ -39,24 +39,24 @@ public class LogicalSimulation extends Simulation {
 		List<Role> calculated_confirmed = new ArrayList<>();
 		// A list of META Roles which we have not yet considered
 		List<Role> unmatched_metas = new ArrayList<>();
-		// A list of the confirmed dead Roles which we have not yet considered
-		List<Role> rem_dead = new ArrayList<>(this.dead);
+		// A list of the confirmed confirmedDead Roles which we have not yet considered
+		List<Role> rem_dead = new ArrayList<>(this.confirmedDead);
 		// A list of roles which are confirmed to be in the game, but we don't know what META Role spawned them yet.
 		List<Role> unmatched_roles = new ArrayList<>();
 		
-		for (Role r : save) {
+		for (Role r : configured) {
 			if (r.hasTag(Tag.META)) {
 				unmatched_metas.add(r);
 			} else {
 				calculated_confirmed.add(r);
 				if (rem_dead.contains(r)) {
-					// We'll assume that the dead Role was explicitly configured in the game. 
+					// We'll assume that the confirmedDead Role was explicitly configured in the game.
 					rem_dead.remove(r);
 				}
 			}
 		}
 		
-		// Add any remaining dead Roles back into our outstanding work
+		// Add any remaining confirmedDead Roles back into our outstanding work
 		unmatched_roles.addAll(rem_dead);
 		rem_dead = null; // Don't need this anymore, so let's cause an error if I forget about that.
 		
