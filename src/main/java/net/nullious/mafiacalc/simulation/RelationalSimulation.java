@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
  * determine the truths about which we can be certain.
  */
 public class RelationalSimulation extends Simulation {
-    // The role relation, in its current state. This relation maps each role to its set of possible roles.
+    // roleRelation maps each role to its set of possible roles.
     protected final Map<Role, Set<Role>> roleRelation;
 
-    // Maximum number of each role that could possibly still be alive.
+    // maxRolesPossiblyAlive maps each role to the number of instances which could possibly be alive.
     protected final Map<Role, Long> maxRolesPossiblyAlive;
     // isSaveStillAlive.get(i) == true iff it is possible that configured role in configured.get(i) could still be alive.
     protected final List<Boolean> isConfiguredStillAlive;

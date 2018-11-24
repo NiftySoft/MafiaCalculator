@@ -1,24 +1,14 @@
 package net.nullious.mafiacalc.simulation;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
 import net.nullious.mafiacalc.Role;
 import net.nullious.mafiacalc.settings.RoleDecider;
 import net.nullious.mafiacalc.settings.gui.SaveSettingsPane;
-import net.nullious.mafiacalc.simulation.RelationalSimulation;
-import net.nullious.mafiacalc.simulation.Simulation;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 class SimulationTest {
 	
@@ -26,7 +16,7 @@ class SimulationTest {
 
 	@ParameterizedTest
 	@ValueSource(classes = { RelationalSimulation.class })
-	void test(Class<?> sim_class) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	void test(Class<?> sim_class) throws Exception {
 		Map<Role, RoleDecider> settings = (new SaveSettingsPane()).getSaveSettings();
 		List<Role> save = Arrays.asList(new Role[] {
 				Role.GODFATHER,
