@@ -14,8 +14,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 class SimulationTest {
 	
 	private static final Class<?>[] constructor_signature = new Class<?>[] { Map.class, List.class, Set.class,
@@ -52,10 +50,8 @@ class SimulationTest {
 		Set<Role> expected_living = EnumSet.of(Role.CITIZEN);
 		List<Role> expected_remaining = Arrays.asList(new Role[] { Role.CITIZEN });
 		Map<Role, Integer>  expected_minCount = new HashMap<>();
-		expected_minCount.put(Role.GODFATHER, 0);
 		expected_minCount.put(Role.CITIZEN, 1);
 		Map<Role, Integer>  expected_maxCount = new HashMap<>();
-		expected_maxCount.put(Role.GODFATHER, 0);
 		expected_maxCount.put(Role.CITIZEN, 1);
 		
 		// Run the test.
