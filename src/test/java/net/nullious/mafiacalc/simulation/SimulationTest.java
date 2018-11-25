@@ -21,6 +21,7 @@ class SimulationTest {
 			
 	private final static Class<?>[] test_targets = new Class<?>[] { 
 				RelationalSimulation.class,
+				DatabaseSimulation.class,
 	};
 	
 	private static final class SimulationProvider implements ArgumentsProvider {
