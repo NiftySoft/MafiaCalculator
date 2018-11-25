@@ -62,10 +62,10 @@ class SimulationTest {
 		
 		
 		// Validate the outputs
-		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output.");
-		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output.");
-		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output.");
-		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output.");
+		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output. " + expected_living + " vs " + sim.getPossiblyLivingRoles());
+		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output. " + expected_remaining + " vs " + sim.getPossiblyLivingInitialConfig());
+		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output. " + expected_minCount + " vs " + sim.getMinPossibleCount());
+		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output. " + expected_maxCount + " vs " + sim.getMaxPossibleCount());
 	}
 
 	@ParameterizedTest
@@ -101,10 +101,10 @@ class SimulationTest {
 		sim.simulate();
 		
 		// Validate the outputs
-		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output.");
-		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output.");
-		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output.");
-		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output.");
+		Assertions.assertTrue(isEquivalentSet(expected_living, sim.getPossiblyLivingRoles()), "Possible Living Roles does not match expected output. " + expected_living + " vs " + sim.getPossiblyLivingRoles());
+		Assertions.assertTrue(isEquivalentList(expected_remaining, sim.getPossiblyLivingInitialConfig()),"Possible Initial Roles does not match expected output. " + expected_remaining + " vs " + sim.getPossiblyLivingInitialConfig());
+		Assertions.assertTrue(isEquivalentMap(expected_minCount, sim.getMinPossibleCount()),"Possible Min Count does not match expected output. " + expected_minCount + " vs " + sim.getMinPossibleCount());
+		Assertions.assertTrue(isEquivalentMap(expected_maxCount, sim.getMaxPossibleCount()), "Possible Max Count does not match expected output. " + expected_maxCount + " vs " + sim.getMaxPossibleCount());
 	}
 
 	private Simulation constructSimulation(Class<?> sim_class, Map<Role, RoleDecider> settings,
